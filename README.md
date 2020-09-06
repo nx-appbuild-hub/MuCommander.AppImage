@@ -1,0 +1,1 @@
+# MuCommander.AppImage

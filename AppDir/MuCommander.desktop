@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=MuCommander
+Comment=muCommander is a lightweight, cross-platform file manager with a dual-pane interface. 
+Exec=AppRun
+Icon=mucommander
+Type=Application
+Categories=Viewer;Utility;FileManager;FileTools;
