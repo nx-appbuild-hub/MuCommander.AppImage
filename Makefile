@@ -12,36 +12,41 @@
 PWD:=$(shell pwd)
 
 all: clean
-	rm -rf $(PWD)/build
-	mkdir -p $(PWD)/build
+	mkdir --parents $(PWD)/build/mucommander
+	mkdir --parents $(PWD)/build/Boilerplate.AppDir/mucommander
+	apprepo --destination=$(PWD)/build appdir boilerplate openjdk-14-jre-headless
+
+	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo 'mkdir -p /tmp/mucommander/felix-cache' 	>> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun		
+	echo '$${APPDIR}/mucommander/mucommander.sh $@' >> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun		
+	echo 'rm -rf /tmp/mucommander' 					>> $(PWD)/build/Boilerplate.AppDir/AppRun		
+
+	cp --force $(PWD)/AppDir/*.desktop     $(PWD)/build/Boilerplate.AppDir || true
+	cp --force $(PWD)/AppDir/*.svg         $(PWD)/build/Boilerplate.AppDir || true
+	cp --force $(PWD)/AppDir/*.png         $(PWD)/build/Boilerplate.AppDir || true
 
 	wget --output-document=$(PWD)/build/build.tar.gz  https://github.com/mucommander/mucommander/releases/download/0.9.5-1/mucommander-0.9.5-1.tar.gz
-	cd $(PWD)/build && tar -zxvf $(PWD)/build/build.tar.gz && cd ..
+	cd $(PWD)/build && tar -zxvf $(PWD)/build/build.tar.gz --directory=$(PWD)/build/mucommander
 
-	mkdir -p $(PWD)/AppDir/application
-	cp -r $(PWD)/build/* $(PWD)/AppDir/application
-	rm -rf $(PWD)/AppDir/application/felix-cache
-	ln -s /tmp/mucommander/felix-cache $(PWD)/AppDir/application/felix-cache
-	rm -rf $(PWD)/AppDir/application/*.rpm
-	rm -rf $(PWD)/AppDir/application/*.zip
-	rm -rf $(PWD)/AppDir/application/*.tar
-	rm -rf $(PWD)/AppDir/application/*.gz
-	rm -rf $(PWD)/build/*
+	rm -rf $(PWD)/build/mucommander/felix-cache
 
-	wget --no-check-certificate --output-document=$(PWD)/build/build.rpm --continue https://forensics.cert.org/centos/cert/8/x86_64/jdk-12.0.2_linux-x64_bin.rpm
-	cd $(PWD)/build && rpm2cpio $(PWD)/build/build.rpm | cpio -idmv && cd ..
+	cp --force --recursive $(PWD)/build/mucommander/* $(PWD)/build/Boilerplate.AppDir/mucommander
 
-	mkdir -p $(PWD)/AppDir/java
-	cp -r $(PWD)/build/usr/java $(PWD)/AppDir
-	rm -rf $(PWD)/build/*
+	ln -s /tmp/mucommander/felix-cache $(PWD)/build/Boilerplate.AppDir/mucommander/felix-cache
+	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.rpm
+	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.zip
+	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.tar
+	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.gz
 
 
-	export ARCH=x86_64 && $(PWD)/bin/appimagetool-x86_64.AppImage  $(PWD)/AppDir $(PWD)/MuCommander.AppImage
-	@echo "done: MuCommander.AppImage"
-	make clean
+	export ARCH=x86_64 && $(PWD)/bin/appimagetool-x86_64.AppImage  $(PWD)/build/Boilerplate.AppDir $(PWD)/MuCommander.AppImage
+	chmod +x $(PWD)/MuCommander.AppImage
 
 
 clean:
-	rm -rf ${PWD}/AppDir/application
-	rm -rf ${PWD}/AppDir/java
-	rm -rf ${PWD}/build
+	rm -rf $(PWD)/build
