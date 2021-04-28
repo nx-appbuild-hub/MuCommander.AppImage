@@ -14,7 +14,7 @@ PWD:=$(shell pwd)
 all: clean
 	mkdir --parents $(PWD)/build/mucommander
 	mkdir --parents $(PWD)/build/Boilerplate.AppDir/mucommander
-	apprepo --destination=$(PWD)/build appdir boilerplate openjdk-14-jre-headless
+	apprepo --destination=$(PWD)/build appdir boilerplate openjdk-14-jre-headless libglib2.0-0
 
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
@@ -30,7 +30,7 @@ all: clean
 	cp --force $(PWD)/AppDir/*.svg         $(PWD)/build/Boilerplate.AppDir || true
 	cp --force $(PWD)/AppDir/*.png         $(PWD)/build/Boilerplate.AppDir || true
 
-	wget --output-document=$(PWD)/build/build.tar.gz  https://github.com/mucommander/mucommander/releases/download/0.9.5-1/mucommander-0.9.5-1.tar.gz
+	wget --output-document=$(PWD)/build/build.tar.gz  https://github.com/mucommander/mucommander/releases/download/0.9.6-1/mucommander-0.9.6-1.tar.gz
 	cd $(PWD)/build && tar -zxvf $(PWD)/build/build.tar.gz --directory=$(PWD)/build/mucommander
 
 	rm -rf $(PWD)/build/mucommander/felix-cache
