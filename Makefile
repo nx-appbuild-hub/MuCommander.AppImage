@@ -9,45 +9,27 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-PWD:=$(shell pwd)
+PWD := $(shell pwd)
+
+DOCKER_COMPOSE:=docker-compose -f $(PWD)/docker-compose.yaml
+
+.EXPORT_ALL_VARIABLES:
+CID=$(shell basename $(PWD) | tr -cd '[:alnum:]' | tr A-Z a-z)
+UID=$(shell id -u)
+GID=$(shell id -g)
+
+.PHONY: all
+
 
 all: clean
-	mkdir --parents $(PWD)/build/mucommander
-	mkdir --parents $(PWD)/build/Boilerplate.AppDir/mucommander
-	apprepo --destination=$(PWD)/build appdir boilerplate openjdk-14-jre-headless libglib2.0-0 libselinux1
-
-	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo 'mkdir -p /tmp/mucommander/felix-cache' 	>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '$${APPDIR}/lib64/jvm/java-14-openjdk-amd64/bin/java -DGNOME_DESKTOP_SESSION_ID=$${GNOME_DESKTOP_SESSION_ID} -DKDE_FULL_SESSION=$${KDE_FULL_SESSION} -DKDE_SESSION_VERSION=$${KDE_SESSION_VERSION} -Djava.library.path=$${APPDIR}/lib64 -cp $${APPDIR}/mucommander/mucommander.jar com.mucommander.main.muCommander $${@}' >> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo 'rm -rf /tmp/mucommander' 					>> $(PWD)/build/Boilerplate.AppDir/AppRun
-
-	cp --force $(PWD)/AppDir/*.desktop     $(PWD)/build/Boilerplate.AppDir || true
-	cp --force $(PWD)/AppDir/*.svg         $(PWD)/build/Boilerplate.AppDir || true
-	cp --force $(PWD)/AppDir/*.png         $(PWD)/build/Boilerplate.AppDir || true
-
-	wget --output-document=$(PWD)/build/build.tar.gz  https://github.com/mucommander/mucommander/releases/download/0.9.6-1/mucommander-0.9.6-1.tar.gz
-	cd $(PWD)/build && tar -zxvf $(PWD)/build/build.tar.gz --directory=$(PWD)/build/mucommander
-
-	rm -rf $(PWD)/build/mucommander/felix-cache
-
-	cp --force --recursive $(PWD)/build/mucommander/* $(PWD)/build/Boilerplate.AppDir/mucommander
-	cp --force $(PWD)/build/Boilerplate.AppDir/mucommander/mucommander*.jar $(PWD)/build/Boilerplate.AppDir/mucommander/mucommander.jar
-
-	ln -s /tmp/mucommander/felix-cache $(PWD)/build/Boilerplate.AppDir/mucommander/felix-cache
-	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.rpm
-	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.zip
-	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.tar
-	rm -rf $(PWD)/build/Boilerplate.AppDir/mucommander/*.gz
-
-
-	export ARCH=x86_64 && $(PWD)/bin/appimagetool-x86_64.AppImage  $(PWD)/build/Boilerplate.AppDir $(PWD)/MuCommander.AppImage
-	chmod +x $(PWD)/MuCommander.AppImage
-
+	$(DOCKER_COMPOSE) stop
+	$(DOCKER_COMPOSE) up --build --no-start
+	$(DOCKER_COMPOSE) up -d  "appimage"
+	$(DOCKER_COMPOSE) run    "appimage" make all
+	$(DOCKER_COMPOSE) run    "appimage" chown -R $(UID):$(GID) ./
+	$(DOCKER_COMPOSE) stop
 
 clean:
-	rm -rf $(PWD)/build
+	$(DOCKER_COMPOSE) up -d  "appimage"
+	$(DOCKER_COMPOSE) run    "appimage" make clean
+	$(DOCKER_COMPOSE) rm --stop --force
