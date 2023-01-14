@@ -16,14 +16,14 @@ PWD:=$(shell pwd)
 all: clean init
 	mkdir --parents $(PWD)/build/mucommander
 	mkdir --parents $(PWD)/build/Boilerplate.AppDir/mucommander
-	$(PWD)/bin/Apprepo.AppImage --destination=$(PWD)/build appdir boilerplate openjdk-8-jre-headless libglib2.0-0 libselinux1
+	$(PWD)/bin/Apprepo.AppImage --destination=$(PWD)/build appdir boilerplate openjdk-11-jdk-headless libglib2.0-0 libselinux1
 
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo 'mkdir -p /tmp/mucommander/felix-cache' 	>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
-	echo '$${APPDIR}/lib64/jvm/java-8-openjdk-amd64/bin/java -DGNOME_DESKTOP_SESSION_ID=$${GNOME_DESKTOP_SESSION_ID} -DKDE_FULL_SESSION=$${KDE_FULL_SESSION} -DKDE_SESSION_VERSION=$${KDE_SESSION_VERSION} -Djava.library.path=$${APPDIR}/lib64 -cp $${APPDIR}/mucommander/mucommander.jar com.mucommander.main.muCommander $${@}' >> $(PWD)/build/Boilerplate.AppDir/AppRun
+	echo '$${APPDIR}/lib64/jvm/java-11-openjdk-amd64/bin/java -DGNOME_DESKTOP_SESSION_ID=$${GNOME_DESKTOP_SESSION_ID} -DKDE_FULL_SESSION=$${KDE_FULL_SESSION} -DKDE_SESSION_VERSION=$${KDE_SESSION_VERSION} -Djava.library.path=$${APPDIR}/lib64 -cp $${APPDIR}/mucommander/mucommander.jar com.mucommander.main.muCommander $${@}' >> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo '' 										>> $(PWD)/build/Boilerplate.AppDir/AppRun
 	echo 'rm -rf /tmp/mucommander' 					>> $(PWD)/build/Boilerplate.AppDir/AppRun
@@ -32,7 +32,7 @@ all: clean init
 	cp --force $(PWD)/AppDir/*.svg         $(PWD)/build/Boilerplate.AppDir || true
 	cp --force $(PWD)/AppDir/*.png         $(PWD)/build/Boilerplate.AppDir || true
 
-	wget --output-document=$(PWD)/build/build.tar.gz  https://github.com/mucommander/mucommander/releases/download/0.9.6-1/mucommander-0.9.6-1.tar.gz
+	wget --output-document=$(PWD)/build/build.tar.gz  https://github.com/mucommander/mucommander/releases/download/nightly/mucommander-snapshot.tgz
 	cd $(PWD)/build && tar -zxvf $(PWD)/build/build.tar.gz --directory=$(PWD)/build/mucommander
 
 	rm -rf $(PWD)/build/mucommander/felix-cache
